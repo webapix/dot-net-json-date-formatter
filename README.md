@@ -55,6 +55,10 @@ If you find our packages useful and would like to support our work in maintainin
 
 Contributions are welcome! When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change.
 
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
 ## Security
 
 If you discover any security related issues, please email pdo@webapix.hu instead of using the issue tracker.

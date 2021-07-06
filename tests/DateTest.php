@@ -21,6 +21,17 @@ class DateTest extends TestCase
     }
 
     /** @test */
+    public function it_can_parse_the_dot_net_json_date_format_with_negative_timestamp()
+    {
+        $dotNetJsonDate = '/Date(-157939200000+0000)/';
+
+        $dateTime = Date::toDateTime($dotNetJsonDate);
+
+        $this->assertInstanceOf(DateTime::class, $dateTime);
+        $this->assertEquals('1964-12-30 00:00:00', $dateTime->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
     public function it_can_parse_the_dot_net_json_date_format_without_timezone()
     {
         $dotNetJsonDate = '/Date(501033600000)/';
@@ -64,6 +75,19 @@ class DateTest extends TestCase
 
         $this->assertEquals('/Date(1593424800000+0200)/', Date::toJsonDate($dateTime));
     }
+
+    /** @test */
+    public function it_can_convert_dates_before_year_1970_to_dot_net_json_date_format()
+    {
+        $dateTime = DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            '1964-12-30 00:00:00',
+            new DateTimeZone('+0000')
+        );
+
+        $this->assertEquals('/Date(-157939200000+0000)/', Date::toJsonDate($dateTime));
+    }
+
     /** @test */
     public function it_throw_an_exception_if_json_date_format_is_invalid()
     {

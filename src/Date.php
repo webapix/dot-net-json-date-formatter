@@ -29,7 +29,7 @@ class Date
      */
     public static function toDateTime($date)
     {
-        preg_match('/Date\((\d+)([+,-]?\d*)\)/', $date, $matches);
+        preg_match('/Date\(([-]?\d+)([+,-]?\d*)\)/', $date, $matches);
 
         if (count($matches) < 2) {
             throw new InvalidJsonDateString('Invalid date format!');
