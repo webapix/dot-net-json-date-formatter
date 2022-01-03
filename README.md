@@ -1,5 +1,5 @@
 # Dotnet JSON date
-[![Build Status](https://travis-ci.com/webapix/dot-net-json-date-formatter.svg?branch=master)](https://travis-ci.com/webapix/dot-net-json-date-formatter)
+[![Tests](https://github.com/webapix/dot-net-json-date-formatter/workflows/Tests/badge.svg)](https://github.com/webapix/dot-net-json-date-formatter/actions?query=workflow%3ATests+branch%3Amaster)
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 Parse [.Net JSON dates](https://docs.microsoft.com/en-us/previous-versions/dotnet/articles/bb299886(v=msdn.10)#from-javascript-literals-to-json) to [DateTime](https://www.php.net/manual/en/class.datetime.php) object, and convert [DateTime](https://www.php.net/manual/en/class.datetime.php) object to .Net JSON date format.
@@ -43,8 +43,8 @@ According to the postcardware concept, if you use the software for your project(
 Please send it to:
 
 WEBAPIX KFT.   
-PF.: 941   
-1535 Budapest   
+Hűvösvölgyi út 54. 2.ép 3.emelet   
+1021 Budapest   
 Hungary
 
 ## Support us
