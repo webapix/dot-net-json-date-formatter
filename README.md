@@ -4,6 +4,13 @@
 
 Parse [.Net JSON dates](https://docs.microsoft.com/en-us/previous-versions/dotnet/articles/bb299886(v=msdn.10)#from-javascript-literals-to-json) to [DateTime](https://www.php.net/manual/en/class.datetime.php) object, and convert [DateTime](https://www.php.net/manual/en/class.datetime.php) object to .Net JSON date format.
 
+## Requirements
+
+- PHP 8.2 or higher
+- A 64-bit PHP build. Millisecond timestamps exceed the 32-bit integer range.
+
+For PHP 5.6 - 8.1 use the 1.x releases.
+
 ## Installation
 
 You can install the package via composer:
@@ -23,6 +30,8 @@ Date::toDateTime('/Date(1593432000000+0200)/'); // return with \DateTime object
 
 If the Json string is invalid, it will throw an \Webapix\DotNetJsonDate\InvalidJsonDateString exception.
 
+Only the exact `/Date(<milliseconds>[<+|-><hhmm>])/` format is accepted. Surrounding characters, a trailing newline, a missing slash, and a truncated or out-of-range offset are all rejected. The offset is limited to what .Net can emit: hours `00`-`14`, minutes `00`-`59`.
+
 To convert DateTime to JSON date:
 ``` php
 use \Webapix\DotNetJsonDate\Date;
@@ -30,6 +39,8 @@ use \Webapix\DotNetJsonDate\Date;
 $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', '2020-06-29 12:00:00');
 Date::toJsonDate($dateTime); // return with: /Date(1593432000000+0000)/
 ```
+
+Both DateTime and DateTimeImmutable are accepted.
 
 ## Testing
 
