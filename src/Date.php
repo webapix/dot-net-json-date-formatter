@@ -3,55 +3,69 @@
 namespace Webapix\DotNetJsonDate;
 
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
-use Exception;
 
 class Date
 {
     /**
-     * @param DateTime $dateTime
-     * @return string
+     * The .Net JSON date format: /Date(<milliseconds>[<+|-><hhmm>])/
+     *
+     * The offset is bound to what .Net itself can emit: hours 00-14, minutes 00-59.
+     * The timestamp is capped at 15 digits, so that it always survives the int cast.
      */
-    public static function toJsonDate(DateTime $dateTime)
+    private const PATTERN = '#^/Date\((-?\d{1,15})([+-](?:0\d|1[0-4])[0-5]\d)?\)/\z#';
+
+    /**
+     * How much of the offending input is quoted back in the exception message.
+     */
+    private const EXCERPT_LENGTH = 50;
+
+    public static function toJsonDate(DateTimeInterface $dateTime): string
     {
-        return sprintf(
-            '/Date(%d%03d%s)/',
-            $dateTime->getTimestamp(),
-            round($dateTime->format('u') / 1000),
-            $dateTime->format('O')
-        );
+        $milliseconds = $dateTime->getTimestamp() * 1000
+            + intdiv((int) $dateTime->format('u'), 1000);
+
+        return sprintf('/Date(%d%s)/', $milliseconds, $dateTime->format('O'));
     }
 
     /**
-     * @param $date
-     * @return DateTime
      * @throws InvalidJsonDateString
      */
-    public static function toDateTime($date)
+    public static function toDateTime(string $date): DateTime
     {
-        preg_match('/Date\(([-]?\d+)([+,-]?\d*)\)/', $date, $matches);
-
-        if (count($matches) < 2) {
-            throw new InvalidJsonDateString('Invalid date format!');
+        if (! preg_match(self::PATTERN, $date, $matches)) {
+            throw self::invalid($date);
         }
 
-        $dateTime = DateTime::createFromFormat(
-            'U.u',
-            sprintf("%d.%06d", $matches[1] / 1000, ($matches[1] % 1000) * 1000)
-        );
+        $milliseconds = (int) $matches[1];
+        $seconds = intdiv($milliseconds, 1000);
+        $remainder = $milliseconds % 1000;
+
+        // Keep the sub-second part positive, so that pre-epoch dates stay exact.
+        if ($remainder < 0) {
+            $seconds--;
+            $remainder += 1000;
+        }
+
+        $dateTime = DateTime::createFromFormat('U.u', sprintf('%d.%06d', $seconds, $remainder * 1000));
 
         if (! $dateTime) {
-            throw new InvalidJsonDateString('Invalid date format!');
+            throw self::invalid($date);
         }
 
-        if (empty($matches[2])) {
+        if (! isset($matches[2])) {
             return $dateTime;
         }
 
-        try {
-            return $dateTime->setTimezone(new DateTimeZone($matches[2]));
-        } catch (Exception $exception) {
-            throw new InvalidJsonDateString($exception->getMessage());
-        }
+        // The pattern already limits the offset to a range DateTimeZone accepts.
+        return $dateTime->setTimezone(new DateTimeZone($matches[2]));
+    }
+
+    private static function invalid(string $date): InvalidJsonDateString
+    {
+        $excerpt = preg_replace('/[[:cntrl:]]/', '', substr($date, 0, self::EXCERPT_LENGTH));
+
+        return new InvalidJsonDateString(sprintf('Invalid .Net JSON date string: "%s"!', $excerpt));
     }
 }
